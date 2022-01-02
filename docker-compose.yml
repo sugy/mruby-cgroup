@@ -1,0 +1,11 @@
+version: "3"
+services:
+  # build on ubuntu 14_04 for glibc 2.14 or later binary like centos7
+  glibc-2.14:
+    build:
+      context: .
+      dockerfile: Dockerfile.glibc-2.14
+    volumes:
+      - .:/home/mruby/code:rw
+    working_dir: /home/mruby/code
+    command: rake compile

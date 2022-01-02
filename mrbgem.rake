@@ -33,18 +33,15 @@ MRuby::Gem::Specification.new('mruby-cgroup') do |spec|
     end
   end
 
-  file libcgroup_dir(build) do
+  unless File.exist? libcgroup_dir(build)
     FileUtils.mkdir_p build.build_dir
-
-    unless File.exists? libcgroup_dir(build)
-      Dir.chdir(build.build_dir) do
-        e = {}
-        run_command e, 'git clone git://github.com/matsumoto-r/libcgroup.git'
-      end
+    Dir.chdir(build.build_dir) do
+      e = {}
+      run_command e, 'git clone git://github.com/matsumotory/libcgroup.git'
     end
   end
 
-  file libfile("#{libcgroup_build_dir(build)}/lib/libcgroup") => libcgroup_dir(build) do
+  unless File.exist? libfile("#{libcgroup_build_dir(build)}/lib/libcgroup")
     Dir.chdir libcgroup_dir(build) do
       e = {
         'CC' => "#{spec.build.cc.command} #{spec.build.cc.flags.join(' ')}",
@@ -61,8 +58,6 @@ MRuby::Gem::Specification.new('mruby-cgroup') do |spec|
       run_command e, "make install"
     end
   end
-
-  file libfile("#{build.build_dir}/lib/libmruby") => libfile("#{libcgroup_build_dir(build)}/lib/libcgroup")
 
   spec.cc.include_paths << "#{libcgroup_build_dir(build)}/include"
   spec.linker.flags_before_libraries << libfile("#{libcgroup_build_dir(build)}/lib/libcgroup")
